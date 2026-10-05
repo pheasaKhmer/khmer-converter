@@ -1,0 +1,28 @@
+# docker compose up -d   (needs TELEGRAM_BOT_TOKEN in the environment or in .env)
+services:
+  web:
+    build: .
+    image: khmer-converter
+    ports:
+      - "8000:8000"
+    volumes:
+      - feedback:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]
+      interval: 30s
+      start_period: 30s
+
+  bot:
+    image: khmer-converter
+    depends_on:
+      - web
+    command: ["python", "-m", "khmer_converter.bot"]
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?set TELEGRAM_BOT_TOKEN}
+    volumes:
+      - feedback:/data
+    restart: unless-stopped
+
+volumes:
+  feedback:
