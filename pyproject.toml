@@ -18,7 +18,7 @@ classifiers = [
     "Topic :: Text Processing :: Linguistic",
     "Typing :: Typed",
 ]
-dependencies = []
+dependencies = ["khmer-engine>=0.1.0.dev0", "pheasa>=0.1.0"]
 
 [project.urls]
 Homepage = "https://github.com/pheasaKhmer/khmer-converter"
@@ -30,6 +30,13 @@ dev = [
     "pytest>=9.1.1",
     "ruff>=0.16.9",
 ]
+
+# Neither is on PyPI yet. The engine is pinned to the tip of its open PR #6; move the pin
+# to main once the engine PRs are merged, and drop these once both are published.
+# pheasa is listed here too because uv only reads sources for direct dependencies.
+[tool.uv.sources]
+khmer-engine = { git = "https://github.com/pheasaKhmer/khmer-engine", rev = "c014b6c692acab917548dcf60fd761a4d84e934e" }
+pheasa = { git = "https://github.com/pheasaKhmer/pheasa", rev = "31c5b83d3685a82be53dc87fbd6c3a72a1299040" }
 
 [build-system]
 requires = ["hatchling"]
