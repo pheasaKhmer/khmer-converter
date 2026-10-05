@@ -1,0 +1,53 @@
+[project]
+name = "khmer-converter"
+dynamic = ["version"]
+description = "Web page and Telegram bot for converting between romanized Khmer and Khmer script."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Samputhy Khim" }]
+maintainers = [{ name = "Samputhy Khim" }]
+keywords = ["khmer", "romanization", "transliteration", "telegram-bot", "fastapi"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Text Processing :: Linguistic",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/pheasaKhmer/khmer-converter"
+Repository = "https://github.com/pheasaKhmer/khmer-converter"
+Issues = "https://github.com/pheasaKhmer/khmer-converter/issues"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.9",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/khmer_converter/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = ["/src/khmer_converter", "/LICENSE", "/README.md"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
