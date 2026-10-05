@@ -59,3 +59,10 @@ def test_with_choices_keeps_english_and_punctuation(converter):
     assert result.text == "អត់មាន wifi ទេ?"
     last = len(result.words) - 1
     assert with_choices(result, {last: "តែ"}) == "អត់មាន wifi តែ?"
+
+
+def test_alternatives_for_the_whole_text(converter):
+    result = converter.convert("bong luy")
+    assert result.alternatives[0] == result.text
+    assert len(result.alternatives) > 1
+    assert converter.convert("ទេ").alternatives == ["te"]

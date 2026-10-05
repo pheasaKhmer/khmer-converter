@@ -40,6 +40,7 @@ class Result:
     input: str
     text: str
     words: list[Word]  # only for to_khmer; empty when romanizing
+    alternatives: list[str]  # whole-text readings, best first; starts with `text`
 
 
 class Converter:
@@ -53,11 +54,12 @@ class Converter:
             Word(t.typed, t.start, t.end, list(dict.fromkeys(c.text for c in t.choices)))
             for t in conversion.tokens
         ]
-        return Result("to_khmer", text, conversion.text, words)
+        return Result("to_khmer", text, conversion.text, words, conversion.alternatives)
 
     def to_latin(self, text: str, style: Style = "chat") -> Result:
         text = text[:MAX_INPUT]
-        return Result("to_latin", text, self.engine.romanize(text, style), [])
+        romanized = self.engine.romanize(text, style)
+        return Result("to_latin", text, romanized, [], [romanized])
 
     def convert(self, text: str, style: Style = "chat") -> Result:
         """Convert in whichever direction the text calls for."""
