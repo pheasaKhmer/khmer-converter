@@ -3,8 +3,8 @@ revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'emscripten'",
-    "python_full_version >= '3.12' and python_full_version < '3.14' and sys_platform == 'emscripten'",
     "python_full_version >= '3.14' and sys_platform != 'emscripten'",
+    "python_full_version >= '3.12' and python_full_version < '3.14' and sys_platform == 'emscripten'",
     "(python_full_version < '3.14' and sys_platform != 'emscripten') or (python_full_version < '3.12' and sys_platform == 'emscripten')",
 ]
 
@@ -198,7 +198,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.142.2" },
-    { name = "khmer-engine", git = "https://github.com/pheasaKhmer/khmer-engine?rev=c014b6c692acab917548dcf60fd761a4d84e934e" },
+    { name = "khmer-engine", git = "https://github.com/pheasaKhmer/khmer-engine?rev=2bcc56a234a89a2a804475db7f8e18dc6c5db350" },
     { name = "pheasa", git = "https://github.com/pheasaKhmer/pheasa?rev=31c5b83d3685a82be53dc87fbd6c3a72a1299040" },
     { name = "python-telegram-bot", specifier = ">=22" },
     { name = "uvicorn", specifier = ">=0.54.0" },
@@ -214,7 +214,7 @@ dev = [
 [[package]]
 name = "khmer-engine"
 version = "0.1.0.dev0"
-source = { git = "https://github.com/pheasaKhmer/khmer-engine?rev=c014b6c692acab917548dcf60fd761a4d84e934e#c014b6c692acab917548dcf60fd761a4d84e934e" }
+source = { git = "https://github.com/pheasaKhmer/khmer-engine?rev=2bcc56a234a89a2a804475db7f8e18dc6c5db350#2bcc56a234a89a2a804475db7f8e18dc6c5db350" }
 dependencies = [
     { name = "pheasa" },
 ]

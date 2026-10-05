@@ -27,7 +27,7 @@ def test_direction(text, expected):
 def test_to_khmer_gives_words_with_alternatives(converter):
     result = converter.convert("bong srolanh oun")
     assert result.direction == "to_khmer"
-    assert result.text == "បងស្រលាញ់អូន"
+    assert result.text == "បងស្រឡាញ់អូន"
     assert [(w.typed, w.start, w.end) for w in result.words] == [
         ("bong", 0, 4),
         ("srolanh", 5, 12),
@@ -50,7 +50,7 @@ def test_long_input_is_cut(converter):
 def test_with_choices_swaps_one_word(converter):
     result = converter.convert("bong srolanh oun")
     assert with_choices(result, {1: "ស្រឡាញ់"}) == "បងស្រឡាញ់អូន"
-    assert with_choices(result, {0: "បង់", 2: "អន"}) == "បង់ស្រលាញ់អន"
+    assert with_choices(result, {0: "បង់", 2: "អន"}) == "បង់ស្រឡាញ់អន"
     assert with_choices(result, {}) == result.text
 
 

@@ -3,7 +3,7 @@ from types import SimpleNamespace
 
 import pytest
 from khmer_engine import Engine
-from telegram.error import BadRequest
+from telegram.error import BadRequest, Conflict, NetworkError
 from telegram.ext import Application
 
 from khmer_converter.bot import (
@@ -275,6 +275,19 @@ def test_application_has_every_handler(bot):
     app = bot.application("123456:TEST-TOKEN")
     assert isinstance(app, Application)
     assert len(app.handlers[0]) == 5
+
+
+def test_network_errors_are_logged_in_one_line(bot, caplog):
+    run(bot.error(None, SimpleNamespace(error=NetworkError("httpx.ReadError: "))))
+    (record,) = caplog.records
+    assert record.levelname == "WARNING"
+    assert record.exc_info is None
+    run(bot.error(None, SimpleNamespace(error=Conflict("terminated by other getUpdates request"))))
+    assert caplog.records[-1].levelname == "WARNING"
+    assert "another copy" in caplog.records[-1].getMessage()
+    run(bot.error(None, SimpleNamespace(error=ValueError("bug"))))
+    assert caplog.records[-1].levelname == "ERROR"
+    assert caplog.records[-1].exc_info is not None
 
 
 def test_main_needs_a_token(monkeypatch):
