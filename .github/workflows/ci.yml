@@ -22,3 +22,22 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: uv sync --locked
       - run: make check
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t khmer-converter .
+      - name: The image serves the page and converts with the full lexicon
+        run: |
+          docker run -d --name web -p 8000:8000 khmer-converter
+          for _ in $(seq 60); do curl -sf http://127.0.0.1:8000/healthz && break; sleep 2; done
+          curl -sf http://127.0.0.1:8000/ | grep -q "<title>Khmer Converter</title>"
+          curl -sf -X POST http://127.0.0.1:8000/api/convert \
+            -H 'Content-Type: application/json' -d '{"text": "sous dey bong"}' \
+            | tee /dev/stderr | grep -q "សួស្តីបង"
+      - name: The bot refuses to start without a token
+        run: |
+          ! docker run --rm khmer-converter python -m khmer_converter.bot
+      - if: failure()
+        run: docker logs web
