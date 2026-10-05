@@ -33,7 +33,7 @@ from telegram import (
     InputTextMessageContent,
     Update,
 )
-from telegram.error import BadRequest, NetworkError
+from telegram.error import BadRequest, Conflict, NetworkError
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
@@ -189,10 +189,13 @@ class KhmerBot:
 
     async def error(self, update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
         """A dropped connection while polling is retried by the library, so it gets one
-        line; without a handler the library logs a full traceback each time. Anything else
-        is a bug and keeps its traceback."""
+        line; without a handler the library logs a full traceback each time. So does a
+        conflict, which means another copy of the bot is running with the same token.
+        Anything else is a bug and keeps its traceback."""
         error = context.error
-        if isinstance(error, NetworkError):
+        if isinstance(error, Conflict):
+            log.warning("another copy of this bot is running with the same token; stop it")
+        elif isinstance(error, NetworkError):
             log.warning("network error, retrying: %s", error)
         else:
             log.error("unhandled error", exc_info=error)

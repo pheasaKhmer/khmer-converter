@@ -3,7 +3,7 @@ from types import SimpleNamespace
 
 import pytest
 from khmer_engine import Engine
-from telegram.error import BadRequest, NetworkError
+from telegram.error import BadRequest, Conflict, NetworkError
 from telegram.ext import Application
 
 from khmer_converter.bot import (
@@ -282,6 +282,9 @@ def test_network_errors_are_logged_in_one_line(bot, caplog):
     (record,) = caplog.records
     assert record.levelname == "WARNING"
     assert record.exc_info is None
+    run(bot.error(None, SimpleNamespace(error=Conflict("terminated by other getUpdates request"))))
+    assert caplog.records[-1].levelname == "WARNING"
+    assert "another copy" in caplog.records[-1].getMessage()
     run(bot.error(None, SimpleNamespace(error=ValueError("bug"))))
     assert caplog.records[-1].levelname == "ERROR"
     assert caplog.records[-1].exc_info is not None
