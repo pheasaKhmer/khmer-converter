@@ -12,3 +12,6 @@ htmlcov/
 .env
 .env.*
 .DS_Store
+
+# Wrong-conversion reports saved by a local run
+feedback.db*
