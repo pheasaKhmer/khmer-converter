@@ -42,7 +42,7 @@ dev = [
 # to main once the engine PRs are merged, and drop these once both are published.
 # pheasa is listed here too because uv only reads sources for direct dependencies.
 [tool.uv.sources]
-khmer-engine = { git = "https://github.com/pheasaKhmer/khmer-engine", rev = "c014b6c692acab917548dcf60fd761a4d84e934e" }
+khmer-engine = { git = "https://github.com/pheasaKhmer/khmer-engine", rev = "2bcc56a234a89a2a804475db7f8e18dc6c5db350" }
 pheasa = { git = "https://github.com/pheasaKhmer/pheasa", rev = "31c5b83d3685a82be53dc87fbd6c3a72a1299040" }
 
 [build-system]

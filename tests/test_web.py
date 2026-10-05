@@ -51,7 +51,7 @@ def test_healthz(client):
 def test_convert_to_khmer(client):
     body = client.post("/api/convert", json={"text": "bong srolanh oun"}).json()
     assert body["direction"] == "to_khmer"
-    assert body["text"] == "បងស្រលាញ់អូន"
+    assert body["text"] == "បងស្រឡាញ់អូន"
     assert body["words"][0] == {
         "typed": "bong",
         "start": 0,
