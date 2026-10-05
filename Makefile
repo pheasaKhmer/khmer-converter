@@ -1,4 +1,4 @@
-.PHONY: check lint format test
+.PHONY: check lint format test web
 
 check: lint test
 
@@ -12,3 +12,7 @@ format:
 
 test:
 	uv run pytest
+
+# Run the web page on http://127.0.0.1:8000
+web:
+	uv run uvicorn --factory khmer_converter.web:create_app --reload

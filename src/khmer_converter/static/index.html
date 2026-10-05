@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Khmer Converter</title>
+<meta name="description" content="Type Khmer in Latin letters and get Khmer script, or paste Khmer to romanize it.">
+<style>
+  @font-face {
+    font-family: "Kantumruy Pro"; font-weight: 400 600; font-display: swap;
+    src: url(/static/fonts/kantumruy-pro-khmer.woff2) format("woff2");
+    unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+  }
+  @font-face {
+    font-family: "Kantumruy Pro"; font-weight: 400 600; font-display: swap;
+    src: url(/static/fonts/kantumruy-pro-latin-ext.woff2) format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
+  @font-face {
+    font-family: "Kantumruy Pro"; font-weight: 400 600; font-display: swap;
+    src: url(/static/fonts/kantumruy-pro-latin.woff2) format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+
+  :root {
+    --bg: #f4f1ea; --surface: #fffdf8; --surface-2: #eeeadf; --text: #1f1c16; --muted: #6b655a;
+    --border: #e0d9ca; --accent: #1f5f73; --accent-ink: #ffffff; --accent-soft: #dcebef;
+    --word: #fff2c9; --danger: #a23131;
+    --shadow: 0 1px 2px rgba(40, 30, 10, 0.06), 0 10px 30px rgba(40, 30, 10, 0.07);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121417; --surface: #1b1e22; --surface-2: #24282d; --text: #eef0f2; --muted: #9aa3ad;
+      --border: #30353b; --accent: #6fb7cc; --accent-ink: #0d1a1f; --accent-soft: #1d3a43;
+      --word: #3b3420; --danger: #f08c8c; --shadow: none;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121417; --surface: #1b1e22; --surface-2: #24282d; --text: #eef0f2; --muted: #9aa3ad;
+    --border: #30353b; --accent: #6fb7cc; --accent-ink: #0d1a1f; --accent-soft: #1d3a43;
+    --word: #3b3420; --danger: #f08c8c; --shadow: none;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.55 "Kantumruy Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 1040px; margin: 0 auto; padding: 28px 16px 48px; }
+  header h1 { margin: 0; font-size: 1.5rem; letter-spacing: -0.01em; }
+  header h1 span { color: var(--accent); }
+  header p { margin: 4px 0 22px; color: var(--muted); }
+
+  .panes { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: stretch; }
+  .pane {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: var(--shadow); display: flex; flex-direction: column; min-width: 0;
+  }
+  .pane-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px 0; min-height: 44px; }
+  .pane-head h2 { margin: 0; font-size: 0.95rem; font-weight: 600; }
+  .pane-body { flex: 1; padding: 6px 14px; }
+  textarea, .output {
+    width: 100%; min-height: 210px; border: 0; outline: none; resize: vertical; background: transparent;
+    color: var(--text); font: inherit; font-size: 1.3rem; line-height: 1.9; padding: 4px 0;
+  }
+  .output { white-space: pre-wrap; overflow-wrap: anywhere; resize: none; }
+  .output .placeholder { color: var(--muted); font-size: 1rem; }
+  .pane-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 10px 10px 14px; border-top: 1px solid var(--border); }
+  .pane-foot .grow { flex: 1; color: var(--muted); font-size: 0.82rem; }
+  .pane-foot .btn:first-of-type { margin-left: auto; }
+  .pane:focus-within { border-color: var(--accent); }
+
+  .swap { align-self: center; }
+  button { font: inherit; cursor: pointer; }
+  .icon {
+    width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); font-size: 1.2rem; box-shadow: var(--shadow);
+  }
+  .icon:hover { background: var(--surface-2); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); padding: 6px 12px; border-radius: 9px; font-size: 0.9rem; }
+  .btn:hover { background: var(--surface-2); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .btn.quiet { border-color: transparent; color: var(--muted); }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+
+  .seg { display: inline-flex; background: var(--surface-2); border-radius: 999px; padding: 3px; }
+  .seg[hidden] { display: none; }
+  .seg button { border: 0; background: transparent; color: var(--muted); padding: 3px 11px; border-radius: 999px; font-size: 0.82rem; }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+
+  .word {
+    display: inline; border: 0; padding: 0; margin: 0; font: inherit; line-height: inherit; color: inherit;
+    background: none; cursor: pointer; border-radius: 4px;
+    text-decoration: underline dotted var(--muted); text-decoration-thickness: 1.5px; text-underline-offset: 0.45em;
+  }
+  .word.changed { text-decoration: underline solid var(--accent); }
+  .word:hover, .word:focus-visible { background: var(--word); outline: none; }
+
+  .menu {
+    position: absolute; z-index: 10; min-width: 160px; max-width: 280px; background: var(--surface); color: var(--text);
+    border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18); padding: 6px;
+  }
+  .menu[hidden] { display: none; }
+  .menu .typed { color: var(--muted); font-size: 0.8rem; padding: 2px 8px 4px; }
+  .menu button { display: block; width: 100%; text-align: left; border: 0; background: none; color: inherit; padding: 4px 8px; border-radius: 8px; font-size: 1.15rem; }
+  .menu button:hover, .menu button:focus-visible { background: var(--surface-2); outline: none; }
+  .menu button[aria-current="true"] { background: var(--accent-soft); }
+
+  footer { margin-top: 26px; color: var(--muted); font-size: 0.85rem; }
+  footer a { color: inherit; }
+
+  dialog { border: 1px solid var(--border); border-radius: 16px; background: var(--surface); color: var(--text); width: min(520px, calc(100% - 32px)); padding: 20px; }
+  dialog::backdrop { background: rgba(0, 0, 0, 0.35); }
+  dialog h2 { margin: 0 0 8px; font-size: 1.1rem; }
+  dialog dl { margin: 0 0 12px; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 0.95rem; }
+  dialog dt { color: var(--muted); }
+  dialog dd { margin: 0; overflow-wrap: anywhere; }
+  dialog label { font-size: 0.9rem; font-weight: 600; }
+  dialog textarea { min-height: 90px; border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; font-size: 1.15rem; margin-top: 4px; background: var(--bg); }
+  dialog .note { color: var(--muted); font-size: 0.82rem; margin: 8px 0 14px; }
+  dialog .row { display: flex; justify-content: flex-end; gap: 8px; }
+  .error { color: var(--danger); font-size: 0.85rem; min-height: 1.2em; }
+
+  .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 10px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .toast.show { opacity: 1; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  @media (max-width: 760px) {
+    .panes { grid-template-columns: 1fr; }
+    .swap { justify-self: center; }
+    .swap .icon { transform: rotate(90deg); }
+    .pane-foot .grow { flex-basis: 100%; }
+    .pane-foot .grow:empty { display: none; }
+    textarea, .output { min-height: 140px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1><span>ខ្មែរ</span> ⇄ Romanized</h1>
+    <p>Type Khmer in Latin letters and get Khmer script, or paste Khmer script to romanize it.</p>
+  </header>
+
+  <div class="panes">
+    <section class="pane" aria-labelledby="from-label">
+      <div class="pane-head">
+        <h2 id="from-label">Romanized Khmer</h2>
+      </div>
+      <div class="pane-body">
+        <label class="visually-hidden" for="input" id="input-label">Text to convert</label>
+        <textarea id="input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+                  placeholder="sok sabay te"></textarea>
+      </div>
+      <div class="pane-foot">
+        <span class="grow" id="status"></span>
+        <button class="btn quiet" type="button" id="clear">Clear</button>
+        <button class="btn" type="button" id="copy-input">Copy</button>
+      </div>
+    </section>
+
+    <div class="swap">
+      <button class="icon" type="button" id="swap" title="Swap direction" aria-label="Swap direction">⇄</button>
+    </div>
+
+    <section class="pane" aria-labelledby="to-label">
+      <div class="pane-head">
+        <h2 id="to-label">Khmer script</h2>
+        <div class="seg" id="style" role="group" aria-label="Romanization style" hidden>
+          <button type="button" data-style="chat" aria-pressed="true">Chat</button>
+          <button type="button" data-style="ungegn" aria-pressed="false">UNGEGN</button>
+        </div>
+      </div>
+      <div class="pane-body">
+        <div class="output" id="output" aria-live="polite"></div>
+      </div>
+      <div class="pane-foot">
+        <span class="grow" id="hint">Tap a dotted word for other readings.</span>
+        <button class="btn quiet" type="button" id="report-open">Wrong conversion?</button>
+        <button class="btn primary" type="button" id="copy-output">Copy</button>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    Nothing you type here is stored. Only what you send with “Wrong conversion?” is kept, to make the
+    converter better. No ads, no tracking.
+    <a href="https://github.com/pheasaKhmer/khmer-converter">Source code</a>.
+  </footer>
+</main>
+
+<div class="menu" id="menu" role="menu" hidden></div>
+
+<dialog id="report">
+  <form method="dialog" id="report-form">
+    <h2>Wrong conversion</h2>
+    <dl>
+      <dt>You typed</dt><dd id="report-input"></dd>
+      <dt>We gave</dt><dd id="report-output"></dd>
+    </dl>
+    <label for="report-correction">It should be</label>
+    <textarea id="report-correction" required></textarea>
+    <p class="note">Only these three texts are saved: what you typed, what we gave, and your correction.
+       No name or account is attached.</p>
+    <p class="error" id="report-error" role="alert"></p>
+    <div class="row">
+      <button class="btn quiet" type="button" id="report-cancel">Cancel</button>
+      <button class="btn primary" type="submit" id="report-send">Send</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  const $ = (selector) => document.querySelector(selector);
+  const input = $("#input");
+  const output = $("#output");
+  const KHMER = new RegExp("[\\u1780-\\u17dd]", "g");
+  const LATIN = /[A-Za-z]/g;
+
+  let direction = "to_khmer";
+  let style = "chat";
+  let result = null; // last response from /api/convert
+  let chosen = {}; // word index -> chosen reading
+  let pending = null;
+  let timer = null;
+
+  function directionOf(text) {
+    const khmer = (text.match(KHMER) || []).length;
+    const latin = (text.match(LATIN) || []).length;
+    return khmer && khmer >= latin ? "to_latin" : "to_khmer";
+  }
+
+  // Same walk as with_choices in service.py: put each chosen reading where its word is.
+  function outputText() {
+    if (!result) return "";
+    if (result.direction !== "to_khmer") return result.text;
+    let out = "";
+    let position = 0;
+    result.words.forEach((word, i) => {
+      const original = word.choices[0];
+      const found = result.text.indexOf(original, position);
+      if (found < 0) return;
+      out += result.text.slice(position, found) + (chosen[i] ?? original);
+      position = found + original.length;
+    });
+    return out + result.text.slice(position);
+  }
+
+  function setDirection(next) {
+    direction = next;
+    const toKhmer = direction === "to_khmer";
+    $("#from-label").textContent = toKhmer ? "Romanized Khmer" : "Khmer script";
+    $("#to-label").textContent = toKhmer ? "Khmer script" : "Romanized";
+    input.placeholder = toKhmer ? "sok sabay te" : "សុខសប្បាយទេ";
+    input.lang = toKhmer ? "en" : "km";
+    output.lang = toKhmer ? "km" : "en";
+    $("#style").hidden = toKhmer;
+    $("#hint").textContent = toKhmer ? "Tap a dotted word for other readings." : "";
+  }
+
+  function render() {
+    closeMenu();
+    if (!result || !input.value.trim()) {
+      const placeholder = document.createElement("span");
+      placeholder.className = "placeholder";
+      placeholder.textContent = direction === "to_khmer" ? "សុខសប្បាយទេ" : "soksabay te";
+      output.replaceChildren(placeholder);
+      return;
+    }
+    if (result.direction !== "to_khmer") {
+      output.textContent = result.text;
+      return;
+    }
+    const nodes = [];
+    let position = 0;
+    result.words.forEach((word, i) => {
+      const original = word.choices[0];
+      const found = result.text.indexOf(original, position);
+      if (found < 0) return;
+      if (found > position) nodes.push(document.createTextNode(result.text.slice(position, found)));
+      const shown = chosen[i] ?? original;
+      if (word.choices.length > 1) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = chosen[i] ? "word changed" : "word";
+        button.dataset.index = String(i);
+        button.textContent = shown;
+        button.setAttribute("aria-haspopup", "menu");
+        button.setAttribute("aria-label", `${shown}, typed ${word.typed}. Other readings`);
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          openMenu(i, button);
+        });
+        nodes.push(button);
+      } else {
+        nodes.push(document.createTextNode(shown));
+      }
+      position = found + original.length;
+    });
+    nodes.push(document.createTextNode(result.text.slice(position)));
+    output.replaceChildren(...nodes);
+  }
+
+  async function convert() {
+    const text = input.value;
+    if (!text.trim()) {
+      result = null;
+      $("#status").textContent = "";
+      render();
+      return;
+    }
+    const detected = directionOf(text);
+    if (detected !== direction) setDirection(detected);
+    pending?.abort();
+    pending = new AbortController();
+    $("#status").textContent = "Converting…";
+    try {
+      const response = await fetch("/api/convert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, direction, style }),
+        signal: pending.signal,
+      });
+      if (!response.ok) throw new Error(response.status === 422 ? "That text is too long." : "Something went wrong.");
+      result = await response.json();
+      chosen = {};
+      $("#status").textContent = "";
+      render();
+    } catch (error) {
+      if (error.name !== "AbortError") $("#status").textContent = error.message;
+    }
+  }
+
+  function schedule() {
+    clearTimeout(timer);
+    timer = setTimeout(convert, 220);
+  }
+
+  const menu = $("#menu");
+  function openMenu(index, anchor) {
+    const word = result.words[index];
+    const typed = document.createElement("div");
+    typed.className = "typed";
+    typed.textContent = `typed “${word.typed}”`;
+    const current = chosen[index] ?? word.choices[0];
+    const options = word.choices.map((choice) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.setAttribute("role", "menuitem");
+      button.lang = "km";
+      button.textContent = choice;
+      if (choice === current) button.setAttribute("aria-current", "true");
+      button.addEventListener("click", () => {
+        if (choice === word.choices[0]) delete chosen[index];
+        else chosen[index] = choice;
+        render();
+        output.querySelector(`[data-index="${index}"]`)?.focus();
+      });
+      return button;
+    });
+    menu.replaceChildren(typed, ...options);
+    menu.hidden = false;
+    const box = anchor.getBoundingClientRect();
+    const left = Math.min(box.left + window.scrollX, window.scrollX + document.documentElement.clientWidth - menu.offsetWidth - 8);
+    menu.style.left = `${Math.max(8, left)}px`;
+    menu.style.top = `${box.bottom + window.scrollY + 6}px`;
+    options[0]?.focus();
+  }
+  function closeMenu() {
+    menu.hidden = true;
+  }
+  document.addEventListener("click", (event) => {
+    if (!menu.contains(event.target)) closeMenu();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeMenu();
+  });
+  window.addEventListener("resize", closeMenu);
+
+  function toast(message) {
+    const el = $("#toast");
+    el.textContent = message;
+    el.classList.add("show");
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => el.classList.remove("show"), 1600);
+  }
+
+  async function copy(text) {
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const area = document.createElement("textarea");
+      area.value = text;
+      document.body.append(area);
+      area.select();
+      document.execCommand("copy");
+      area.remove();
+    }
+    toast("Copied");
+  }
+
+  input.addEventListener("input", schedule);
+  $("#clear").addEventListener("click", () => {
+    input.value = "";
+    convert();
+    input.focus();
+  });
+  $("#copy-input").addEventListener("click", () => copy(input.value));
+  $("#copy-output").addEventListener("click", () => copy(outputText()));
+  $("#swap").addEventListener("click", () => {
+    const text = outputText();
+    setDirection(direction === "to_khmer" ? "to_latin" : "to_khmer");
+    input.value = text;
+    convert();
+    input.focus();
+  });
+  for (const button of document.querySelectorAll("#style button")) {
+    button.addEventListener("click", () => {
+      style = button.dataset.style;
+      for (const other of document.querySelectorAll("#style button")) {
+        other.setAttribute("aria-pressed", String(other === button));
+      }
+      convert();
+    });
+  }
+
+  const dialog = $("#report");
+  $("#report-open").addEventListener("click", () => {
+    if (!input.value.trim() || !result) {
+      toast("Type something first");
+      return;
+    }
+    $("#report-input").textContent = input.value;
+    $("#report-output").textContent = outputText();
+    $("#report-correction").value = outputText();
+    $("#report-error").textContent = "";
+    dialog.showModal();
+    $("#report-correction").focus();
+  });
+  $("#report-cancel").addEventListener("click", () => dialog.close());
+  $("#report-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const correction = $("#report-correction").value.trim();
+    if (!correction) return;
+    $("#report-send").disabled = true;
+    try {
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ direction, input: input.value, output: outputText(), correction }),
+      });
+      if (!response.ok) throw new Error("Could not send. Please try again.");
+      dialog.close();
+      toast("Thanks, saved");
+    } catch (error) {
+      $("#report-error").textContent = error.message;
+    } finally {
+      $("#report-send").disabled = false;
+    }
+  });
+
+  setDirection(direction);
+  render();
+  input.focus();
+})();
+</script>
+</body>
+</html>
