@@ -22,6 +22,7 @@ dependencies = [
     "fastapi>=0.142.2",
     "khmer-engine>=0.1.0.dev0",
     "pheasa>=0.1.0",
+    "python-telegram-bot>=22",
     "uvicorn>=0.54.0",
 ]
 
