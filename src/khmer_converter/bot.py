@@ -33,7 +33,7 @@ from telegram import (
     InputTextMessageContent,
     Update,
 )
-from telegram.error import BadRequest
+from telegram.error import BadRequest, NetworkError
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
@@ -184,7 +184,18 @@ class KhmerBot:
         app.add_handler(InlineQueryHandler(self.inline))
         private_text = filters.TEXT & ~filters.COMMAND & filters.ChatType.PRIVATE
         app.add_handler(MessageHandler(private_text, self.message))
+        app.add_error_handler(self.error)
         return app
+
+    async def error(self, update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """A dropped connection while polling is retried by the library, so it gets one
+        line; without a handler the library logs a full traceback each time. Anything else
+        is a bug and keeps its traceback."""
+        error = context.error
+        if isinstance(error, NetworkError):
+            log.warning("network error, retrying: %s", error)
+        else:
+            log.error("unhandled error", exc_info=error)
 
     async def help(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         name = context.bot.username if getattr(context, "bot", None) else "bot"
