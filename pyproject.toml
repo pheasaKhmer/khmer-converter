@@ -18,7 +18,12 @@ classifiers = [
     "Topic :: Text Processing :: Linguistic",
     "Typing :: Typed",
 ]
-dependencies = ["khmer-engine>=0.1.0.dev0", "pheasa>=0.1.0"]
+dependencies = [
+    "fastapi>=0.142.2",
+    "khmer-engine>=0.1.0.dev0",
+    "pheasa>=0.1.0",
+    "uvicorn>=0.54.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/pheasaKhmer/khmer-converter"
@@ -27,6 +32,7 @@ Issues = "https://github.com/pheasaKhmer/khmer-converter/issues"
 
 [dependency-groups]
 dev = [
+    "httpx2>=2.13.1",
     "pytest>=9.1.1",
     "ruff>=0.16.9",
 ]
