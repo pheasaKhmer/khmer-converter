@@ -199,7 +199,7 @@ dev = [
 requires-dist = [
     { name = "fastapi", specifier = ">=0.142.2" },
     { name = "khmer-engine", git = "https://github.com/pheasaKhmer/khmer-engine?rev=73b5984588da5b64de65ffcef3b093fd544c30f3" },
-    { name = "pheasa", git = "https://github.com/pheasaKhmer/pheasa?rev=31c5b83d3685a82be53dc87fbd6c3a72a1299040" },
+    { name = "pheasa", specifier = ">=0.1.0" },
     { name = "python-telegram-bot", specifier = ">=22" },
     { name = "uvicorn", specifier = ">=0.54.0" },
 ]
