@@ -38,12 +38,9 @@ dev = [
     "ruff>=0.16.9",
 ]
 
-# Neither is on PyPI yet. The engine is pinned to the tip of its open PR #6; move the pin
-# to main once the engine PRs are merged, and drop these once both are published.
-# pheasa is listed here too because uv only reads sources for direct dependencies.
+# khmer-engine is not on PyPI, so it is pinned to a commit on its main branch.
 [tool.uv.sources]
-khmer-engine = { git = "https://github.com/pheasaKhmer/khmer-engine", rev = "73b5984588da5b64de65ffcef3b093fd544c30f3" }
-pheasa = { git = "https://github.com/pheasaKhmer/pheasa", rev = "31c5b83d3685a82be53dc87fbd6c3a72a1299040" }
+khmer-engine = { git = "https://github.com/pheasaKhmer/khmer-engine", rev = "a66664773314a5bbb249f02d454d16d30b3674ef" }
 
 [build-system]
 requires = ["hatchling"]
