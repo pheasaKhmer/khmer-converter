@@ -40,7 +40,7 @@ dev = [
 
 # khmer-engine is not on PyPI, so it is pinned to a commit on its main branch.
 [tool.uv.sources]
-khmer-engine = { git = "https://github.com/pheasaKhmer/khmer-engine", rev = "2d6786682e01423b52b28e0381e02994a243b41e" }
+khmer-engine = { git = "https://github.com/pheasaKhmer/khmer-engine", rev = "b6bf42ec1705df131d8745784e80967e86e80924" }
 
 [build-system]
 requires = ["hatchling"]

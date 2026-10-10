@@ -198,7 +198,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.142.2" },
-    { name = "khmer-engine", git = "https://github.com/pheasaKhmer/khmer-engine?rev=2d6786682e01423b52b28e0381e02994a243b41e" },
+    { name = "khmer-engine", git = "https://github.com/pheasaKhmer/khmer-engine?rev=b6bf42ec1705df131d8745784e80967e86e80924" },
     { name = "pheasa", specifier = ">=0.1.0" },
     { name = "python-telegram-bot", specifier = ">=22" },
     { name = "uvicorn", specifier = ">=0.54.0" },
@@ -214,7 +214,7 @@ dev = [
 [[package]]
 name = "khmer-engine"
 version = "0.1.0.dev0"
-source = { git = "https://github.com/pheasaKhmer/khmer-engine?rev=2d6786682e01423b52b28e0381e02994a243b41e#2d6786682e01423b52b28e0381e02994a243b41e" }
+source = { git = "https://github.com/pheasaKhmer/khmer-engine?rev=b6bf42ec1705df131d8745784e80967e86e80924#b6bf42ec1705df131d8745784e80967e86e80924" }
 dependencies = [
     { name = "pheasa" },
 ]
